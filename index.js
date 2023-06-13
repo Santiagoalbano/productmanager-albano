@@ -1,25 +1,60 @@
 
- 
-  const productManager = new ProductManager();
-  console.log(productManager.getProducts()); // Devuelve []
+class ProductManager {
+    constructor() {
+      this.products = [];
+      this.lastProductId = 0;
+    }
   
-  productManager.addProduct("Camiseta", "Camiseta de algodón", 19.99, "imagen.jpg", "C001", 10);
-  console.log(productManager.getProducts()); // Devuelve el producto recién agregado
+    getProducts() {
+      return this.products;
+    }
   
-  // Intentar agregar un producto con el mismo código
-  try {
-    productManager.addProduct("Pantalón", "Pantalón vaquero", 29.99, "imagen2.jpg", "C001", 5);
-  } catch (error) {
-    console.log(error.message); // Imprime el mensaje de error
+    addProduct(title, description, price, photo, code, stock) {
+      const existingProduct = this.products.find(product => product.code === code);
+      if (existingProduct) {
+        throw new Error("El código de producto ya existe. Por favor, ingresa un código único.");
+      }
+  
+      const productId = this.generateProductId();
+      const newProduct = {
+        id: productId,
+        title: title,
+        description: description,
+        price: price,
+        photo: photo,
+        code: code,
+        stock: stock
+      };
+  
+      this.products.push(newProduct);
+    }
+  
+    getProductById(productId) {
+      const product = this.products.find(product => product.id === productId);
+      if (!product) {
+        throw new Error("No se encontró ningún producto con el ID especificado.");
+      }
+  
+      return product;
+    }
+  
+    updateProduct(productId, updatedFields) {
+      const product = this.getProductById(productId);
+      Object.assign(product, updatedFields);
+    }
+  
+    deleteProduct(productId) {
+      const productIndex = this.products.findIndex(product => product.id === productId);
+      if (productIndex === -1) {
+        throw new Error("No se encontró ningún producto con el ID especificado.");
+      }
+  
+      this.products.splice(productIndex, 1);
+    }
+  
+    generateProductId() {
+      this.lastProductId++;
+      return this.lastProductId;
+    }
   }
   
-  // Obtener un producto por ID
-  const product = productManager.getProductById(1);
-  console.log(product); // Imprime el producto encontrado
-  
-  // Intentar obtener un producto con un ID inexistente
-  try {
-    const nonExistentProduct = productManager.getProductById(99);
-  } catch (error) {
-    console.log(error.message); // Imprime el mensaje de error
-  }
